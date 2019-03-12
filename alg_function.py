@@ -89,7 +89,6 @@ class algFunctions():
                 lst=[]
                 for i in range(len(arry)):
                     in_list = []
-                    avr_p = 0
                     st_p = 0
                     en_p = 0
 

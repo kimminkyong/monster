@@ -8,8 +8,6 @@ import alg_function as algFn
 import ma01_monster
 import monster_log
 
-from multiprocessing import Process
-
 
 class PyMonster():
 	def __init__(self):
