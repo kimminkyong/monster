@@ -1,0 +1,123 @@
+import sys
+import time
+import pandas as pd
+from pandas import DataFrame
+import datetime
+
+import set_database_monster
+import alg_function
+import monster_log
+
+MA01_ALGORITHM_LIST = []
+MA01_ALGORITHM_TABLE = "MA01"
+
+class MA01():
+    def __init__(self):
+        print("MA01 INIT!!")
+        self.monsterDB  = set_database_monster.setDatabaseMonster()
+        self.monsterLog = monster_log.monsterLog()
+        self.algFn = alg_function.algFunctions()
+
+    def createAlgorithmTable(self, tableName):
+        sdi_db = self.monsterDB.dbSDI()
+        try:
+            with sdi_db.cursor() as curs:
+                curs.execute( "CREATE TABLE IF NOT EXISTS `"+tableName+"` (date  VARCHAR(20), code  VARCHAR(20), today_volume VARCHAR(255), avr30_volume VARCHAR(255), avr60_volume VARCHAR(255), change_per VARCHAR(100), alg_step VARCHAR(20) )" )
+        finally:
+            sdi_db.commit()
+            print("%s 테이블이 생성 되었습니다." %tableName)
+    
+    def initTableLowsToday(self):
+        sdi_db = self.monsterDB.dbSDI()
+        initToday = datetime.datetime.now().strftime("%Y-%m-%d")
+        try:
+            with sdi_db.cursor() as curs:
+                curs.execute( "delete from "+MA01_ALGORITHM_TABLE+" where date='"+initToday+"'" )
+        finally:
+            sdi_db.commit()
+            print("init table lows delete")
+        
+    
+    def insertAlgorithmFilteringList(self, tableName, arrayData, algStep):
+        sci_db = self.monsterDB.dbSCI()
+        
+        for i in range(len(arrayData)):
+            try:
+                with sci_db.cursor() as curs:
+                    sql = "SELECT * FROM `today_stock_info` WHERE code='"+arrayData[i]+"' "
+                    curs.execute(sql)
+                    result = curs.fetchone()
+                    if result:
+                        self.insertListData(tableName, result, algStep)
+                    else:
+                        print("find_date_stock_info")
+            finally:
+                print("find_date_stock_info")
+
+    def insertListData(self, tableName, arrayData, algStep):
+        sdi_db = self.monsterDB.dbSDI()
+        avr30_vol = self.algFn.get_avr_volume(arrayData[0], 30)
+        avr60_vol = self.algFn.get_avr_volume(arrayData[0], 60)
+        
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "INSERT INTO `"+tableName+"` (code, date, today_volume, avr30_volume, avr60_volume, change_per, alg_step) values (%s,%s,%s,%s,%s,%s,%s)"
+                curs.execute( sql, (arrayData[0], arrayData[1], int(arrayData[6]), int(avr30_vol), int(avr60_vol),  arrayData[7], algStep ) )
+        finally:
+            sdi_db.commit()
+    
+    def updateAlgorithmFilteringList(self, arrayData, algStep):
+        sci_db = self.monsterDB.dbSCI()
+        
+        for i in range(len(arrayData)):
+            try:
+                with sci_db.cursor() as curs:
+                    sql = "SELECT * FROM `today_stock_info` WHERE code='"+arrayData[i]+"' "
+                    curs.execute(sql)
+                    result = curs.fetchone()
+                    if result:
+                        self.updateListData(result, algStep)
+                    else:
+                        print("find_date_stock_info")
+            finally:
+                print("find_date_stock_info")
+    
+    def updateListData(self, arrayData, algStep):
+        sdi_db = self.monsterDB.dbSDI()
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "UPDATE "+MA01_ALGORITHM_TABLE+" SET alg_step = '"+algStep+"' WHERE code = '"+arrayData[0]+"' and date = '"+arrayData[1]+"' "
+                print(sql)
+                curs.execute( sql )
+        finally:
+            sdi_db.commit()
+
+    def do_classification_algorithm(self):
+        print("MA01!! Do Classification Algorithm!")
+        self.createAlgorithmTable(MA01_ALGORITHM_TABLE)
+        self.monsterLog.add_log( 1, 'MA01 알고리즘 검색 시작!!' )
+        #최고가 최저가 범위 내의 종목 검색 
+        MA01_ALGORITHM_LIST = self.algFn.min_max_price_filter(500, 50000)
+        
+        self.monsterLog.add_log( 1, '30거래일 동안의 거래량 10 이상의 종목 검색' )
+        MA01_ALGORITHM_LIST = self.algFn.over_volume10_30day(MA01_ALGORITHM_LIST)
+        print(MA01_ALGORITHM_LIST)
+        
+        self.monsterLog.add_log( 1, '양봉 종목 검색' )
+        MA01_ALGORITHM_LIST = self.algFn.red_colum_check(MA01_ALGORITHM_LIST)
+        print(MA01_ALGORITHM_LIST)
+        
+        self.monsterLog.add_log( 1, 'MA01 알고리즘 테이블 초기화 및 데이터 저장 시작!' )
+        self.initTableLowsToday() #algorithm data table init before save data list
+        self.insertAlgorithmFilteringList(MA01_ALGORITHM_TABLE, MA01_ALGORITHM_LIST, 'step1')
+        print(MA01_ALGORITHM_LIST)
+        self.monsterLog.add_log( 1, 'MA01 알고리즘 STEP1 저장 완료!' )
+        
+        #종가기준 140선을 통과한 종목 검색
+        MA01_ALGORITHM_LIST = self.algFn.cross_over_line140(MA01_ALGORITHM_LIST)
+        print(MA01_ALGORITHM_LIST)
+        self.monsterLog.add_log( 1, 'MA01 알고리즘 검색 종료!!' )
+        self.updateAlgorithmFilteringList(MA01_ALGORITHM_LIST, 'step2')
+        self.monsterLog.add_log( 1, 'MA01 알고리즘 STEP2 업데이트 완료!' )
+        
+
