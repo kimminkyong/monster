@@ -15,9 +15,9 @@ class algFunctions():
         self.monsterDB  = set_database_monster.setDatabaseMonster()
     
     def min_max_price_filter(self, min, max):
-        sci_db = self.monsterDB.dbSCI()
+        sdi_db = self.monsterDB.dbSDI()
         try:
-            with sci_db.cursor() as curs:
+            with sdi_db.cursor() as curs:
                 lst=[]
                 sql = "SELECT * FROM `today_stock_info` "
                 curs.execute(sql)
@@ -67,7 +67,6 @@ class algFunctions():
             with sci_db.cursor() as curs:
                 lst=[]
                 for i in range(len(arry)):
-                    in_list = []
                     start_price = 0
                     end_price = 0
 
@@ -76,6 +75,7 @@ class algFunctions():
                     items = curs.fetchone()
                     start_price = items[3]
                     end_price = items[4]
+
                     if(int(end_price) > int(start_price)):
                         lst.append(arry[i])
                 return lst

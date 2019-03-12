@@ -39,18 +39,18 @@ class MA01():
         
     
     def insertAlgorithmFilteringList(self, tableName, arrayData, algStep):
-        sci_db = self.monsterDB.dbSCI()
+        sdi_db = self.monsterDB.dbSDI()
         
         for i in range(len(arrayData)):
             try:
-                with sci_db.cursor() as curs:
+                with sdi_db.cursor() as curs:
                     sql = "SELECT * FROM `today_stock_info` WHERE code='"+arrayData[i]+"' "
                     curs.execute(sql)
                     result = curs.fetchone()
                     if result:
                         self.insertListData(tableName, result, algStep)
                     else:
-                        print("find_date_stock_info")
+                        print("??")
             finally:
                 print("find_date_stock_info")
 
@@ -62,16 +62,17 @@ class MA01():
         try:
             with sdi_db.cursor() as curs:
                 sql = "INSERT INTO `"+tableName+"` (code, date, today_volume, avr30_volume, avr60_volume, change_per, alg_step) values (%s,%s,%s,%s,%s,%s,%s)"
+                print(sql)
                 curs.execute( sql, (arrayData[0], arrayData[1], int(arrayData[6]), int(avr30_vol), int(avr60_vol),  arrayData[7], algStep ) )
         finally:
             sdi_db.commit()
     
     def updateAlgorithmFilteringList(self, arrayData, algStep):
-        sci_db = self.monsterDB.dbSCI()
+        sdi_db = self.monsterDB.dbSDI()
         
         for i in range(len(arrayData)):
             try:
-                with sci_db.cursor() as curs:
+                with sdi_db.cursor() as curs:
                     sql = "SELECT * FROM `today_stock_info` WHERE code='"+arrayData[i]+"' "
                     curs.execute(sql)
                     result = curs.fetchone()

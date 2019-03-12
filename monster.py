@@ -49,7 +49,7 @@ class PyMonster():
 if __name__=="__main__":
 	pymonster = PyMonster()
 
-	pymonster.monster_brilliant_start()
+	#pymonster.monster_brilliant_start()
 	#pymonster.monster_daily_doit()
 	
 	#time.sleep(120) #내 컴은 소중하니깐(2분간 휴식)
