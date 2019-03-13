@@ -84,12 +84,15 @@ class stockCodeCrawler():
                 with sci_db.cursor() as curs:
                     sql = "INSERT INTO `"+tableName+"` (date, high, low, open, close, volume, change_per) values (%s,%s,%s,%s,%s,%s,%s)"
                     curs.execute( sql, (arrayData[0], int(arrayData[1]), int(arrayData[2]), int(arrayData[3]), int(arrayData[4]), int(arrayData[5]), arrayData[6]) )
-                with sdi_db.cursor() as curs:
-                    sql_today = "INSERT INTO `today_stock_info` (code, date, high, low, open, close, volume, change_per) values (%s,%s,%s,%s,%s,%s,%s,%s)"
-                    curs.execute( sql_today, (tableName, arrayData[0], int(arrayData[1]), int(arrayData[2]), int(arrayData[3]), int(arrayData[4]), int(arrayData[5]), arrayData[6]) )        
             finally:
                 sci_db.commit()
-                sdi_db.commit()
+        else:
+            try:
+                with sdi_db.cursor() as curs:
+                    sql_today = "INSERT INTO `today_stock_info` (code, date, high, low, open, close, volume, change_per) values (%s,%s,%s,%s,%s,%s,%s,%s)"
+                    curs.execute( sql_today, (tableName, arrayData[0], int(arrayData[1]), int(arrayData[2]), int(arrayData[3]), int(arrayData[4]), int(arrayData[5]), arrayData[6]) )
+                finally:
+                    sdi_db.commit()        
     
     def find_date_stock_info(self, date, tableName):
         sci_db = self.monsterDB.dbSCI()
