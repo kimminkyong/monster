@@ -141,7 +141,7 @@ class stockCodeCrawler():
             with sdi_db.cursor() as curs:
                 curs.execute( "TRUNCATE TABLE `today_stock_info`" )
         finally:
-            sci_db.commit()
+            sdi_db.commit()
 
         num = 0
         for i in range(len(MARKET_CODE)):
