@@ -138,7 +138,7 @@ class algFunctions():
                     sumVolume = int(sum(in_list)) - int(in_list[0])
                     
                     avrVolume = int(sumVolume/day_len)
-                    return avrVolume
+                return avrVolume
         finally:
             print("get_avr_volume OK!!")
 
