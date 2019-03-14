@@ -122,7 +122,7 @@ class algFunctions():
         try:
             with sci_db.cursor() as curs:
                 day_len = int(day)
-                sumVolume = 0
+                avrVolume = 0
                 in_list=[]
                 sql = "SELECT volume FROM `"+code+"` ORDER BY date DESC"
                 curs.execute(sql)
