@@ -22,7 +22,16 @@ class MA01():
         sdi_db = self.monsterDB.dbSDI()
         try:
             with sdi_db.cursor() as curs:
-                curs.execute( "CREATE TABLE IF NOT EXISTS `"+tableName+"` (date  VARCHAR(20), code  VARCHAR(20), today_volume VARCHAR(255), avr30_volume VARCHAR(255), avr60_volume VARCHAR(255), change_per VARCHAR(100), alg_step VARCHAR(20) )" )
+                curs.execute( "CREATE TABLE IF NOT EXISTS `"+tableName+"` (date  VARCHAR(20), code  VARCHAR(20), today_volume VARCHAR(255), avr30_volume VARCHAR(255), avr60_volume VARCHAR(255), change_per VARCHAR(100), alg_step VARCHAR(20), max_price VARCHAR(255), min_price VARCHAR(255), tracking BOOLEAN )" )
+        finally:
+            sdi_db.commit()
+            print("%s 테이블이 생성 되었습니다." %tableName)
+    
+    def createDailyAlgorithmListTable(self, tableName):
+        sdi_db = self.monsterDB.dbSDI()
+        try:
+            with sdi_db.cursor() as curs:
+                curs.execute( "CREATE TABLE IF NOT EXISTS `"+tableName+"` (date  VARCHAR(20), step1  VARCHAR(20), step2 VARCHAR(20) )" )
         finally:
             sdi_db.commit()
             print("%s 테이블이 생성 되었습니다." %tableName)
@@ -67,6 +76,17 @@ class MA01():
         finally:
             sdi_db.commit()
     
+    def insertDailyListDataInfo(self, step, lng):
+        sdi_db = self.monsterDB.dbSDI()
+        todayString = datetime.datetime.now().strftime("%Y-%m-%d")
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "INSERT INTO `MA01_daily_list` (date, step1) values (%s,%s)"
+                print(sql)
+                curs.execute( sql, (todayString, lng ) )
+        finally:
+            sdi_db.commit()
+    
     def updateAlgorithmFilteringList(self, arrayData, algStep):
         sdi_db = self.monsterDB.dbSDI()
         
@@ -92,10 +112,23 @@ class MA01():
                 curs.execute( sql )
         finally:
             sdi_db.commit()
+    
+    def updateDailyListDataInfo(self, step, lng):
+        sdi_db = self.monsterDB.dbSDI()
+        todayString = datetime.datetime.now().strftime("%Y-%m-%d")
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "UPDATE `MA01_daily_list` SET step2 = '"+lng+"' WHERE date = '"+todayString+"' "
+                print(sql)
+                curs.execute( sql )
+        finally:
+            sdi_db.commit()
 
     def do_classification_algorithm(self):
         print("MA01!! Do Classification Algorithm!")
         self.createAlgorithmTable(MA01_ALGORITHM_TABLE)
+        self.createDailyAlgorithmListTable('MA01_daily_list')
+
         self.monsterLog.add_log( 1, 'MA01 알고리즘 검색 시작!!' )
         #최고가 최저가 범위 내의 종목 검색 
         MA01_ALGORITHM_LIST = self.algFn.min_max_price_filter(500, 50000)
@@ -111,6 +144,7 @@ class MA01():
         self.monsterLog.add_log( 1, 'MA01 알고리즘 테이블 초기화 및 데이터 저장 시작!' )
         self.initTableLowsToday() #algorithm data table init before save data list
         self.insertAlgorithmFilteringList(MA01_ALGORITHM_TABLE, MA01_ALGORITHM_LIST, 'step1')
+        self.insertDailyListDataInfo('step01',len(MA01_ALGORITHM_LIST))
         print(MA01_ALGORITHM_LIST)
         self.monsterLog.add_log( 1, 'MA01 알고리즘 STEP1 저장 완료!' )
         
@@ -120,5 +154,9 @@ class MA01():
         self.monsterLog.add_log( 1, 'MA01 알고리즘 검색 종료!!' )
         self.updateAlgorithmFilteringList(MA01_ALGORITHM_LIST, 'step2')
         self.monsterLog.add_log( 1, 'MA01 알고리즘 STEP2 업데이트 완료!' )
+
+        self.monsterLog.add_log( 1, 'MA01 알고리즘 리스트 Tracking Start!!' )
+        self.algFn.min_max_price_tracking()
+        self.monsterLog.add_log( 1, 'MA01 알고리즘 리스트 Tracking End!!' )
         
 

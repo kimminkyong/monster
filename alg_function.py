@@ -154,6 +154,119 @@ class algFunctions():
         finally:
             print("get_today_per_close OK!!")
 
+    def min_max_price_between_date(self, code, sdate):
+        #todayString = datetime.datetime.now().strftime("%Y-%m-%d")
+        tomorrows = datetime.datetime.today()+datetime.timedelta(days=1)
+        tomorrowsString = tomorrows.strftime("%Y-%m-%d")
+        print(tomorrowsString)
+
+        atday = datetime.datetime.today()-datetime.timedelta(days=30)
+        atdayString = atday.strftime("%Y-%m-%d")
+        print(atdayString)
+
+        sci_db = self.monsterDB.dbSCI()
+        max_list = []
+        min_list = []
+        return_list=[]
+        try:
+            with sci_db.cursor() as curs:
+                sql = "SELECT high,low FROM `"+code+"` WHERE date BETWEEN '"+sdate+"' AND '"+tomorrowsString+"' ORDER BY date DESC"
+                print(sql)
+                curs.execute(sql)
+                items = curs.fetchall()
+                print(items)
+                for i in range(len(items)):
+                    max_list.append(items[i][0])
+                    min_list.append(items[i][1])
+                
+        finally:
+            print(max_list)
+            print(min_list)
+            return_list.append(max(max_list))
+            return_list.append(min(min_list))
+            print(return_list)
+            print("min max price check!")
+            return return_list
+
+    def custom_add_colume(self, c_name, after_colume):
+        sdi_db = self.monsterDB.dbSDI()
+
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "ALTER TABLE `MA01` ADD "+c_name+" VARCHAR(255) AFTER "+after_colume+" "
+                print(sql)
+                curs.execute(sql)
+        finally:
+            print(c_name)
+    
+    def custom_add_colume_bool(self, c_name, after_colume):
+        sdi_db = self.monsterDB.dbSDI()
+
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "ALTER TABLE `MA01` ADD "+c_name+" BOOLEAN AFTER "+after_colume+" "
+                print(sql)
+                curs.execute(sql)
+        finally:
+            print(c_name)
+    
+    def delete_table_column(self):
+        sdi_db = self.monsterDB.dbSDI()
+
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "ALTER TABLE `MA01` drop `tracking`"
+                print(sql)
+                curs.execute(sql)
+        finally:
+            print("삭제완료")
+
+   
+
+    def min_max_price_update(self, date, code, max_p, min_p):
+        sdi_db = self.monsterDB.dbSDI()
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "UPDATE `MA01` SET max_price = "+max_p+", min_price = "+min_p+", tracking = 1 WHERE code = '"+code+"' and date = '"+date+"' "
+                result = curs.execute( sql )
+                print(result)
+        finally:
+            sdi_db.commit()
+            print("종목 트래킹 완료!")
+    
+    def min_max_price_tracking(self):
+        sdi_db = self.monsterDB.dbSDI()
+        tomorrows = datetime.datetime.today()+datetime.timedelta(days=1)
+        tomorrowsString = tomorrows.strftime("%Y-%m-%d")
+
+        atday = datetime.datetime.today()-datetime.timedelta(days=60)
+        atdayString = atday.strftime("%Y-%m-%d")
+
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "UPDATE `MA01` SET tracking=0"
+                curs.execute(sql)
+        finally:
+            sdi_db.commit()
+            print("MA01 테이블 tracking colume 초기화!")
+
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "SELECT date,code FROM `MA01` WHERE date BETWEEN '"+atdayString+"' AND '"+tomorrowsString+"' ORDER BY date DESC"
+                curs.execute(sql)
+                result = curs.fetchall()
+                if result:
+                    for i in range(len(result)):
+                        nx_price = self.min_max_price_between_date(result[i][1], result[i][0])
+                        self.min_max_price_update(result[i][0], result[i][1], str(nx_price[0]), str(nx_price[1]))
+                else:
+                    print("MA01 table list get error")
+        finally:
+            print("min_max_price_tracking!")
+
+        
+
+
     
 
 
