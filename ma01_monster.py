@@ -154,6 +154,7 @@ class MA01():
         self.monsterLog.add_log( 1, 'MA01 알고리즘 검색 종료!!' )
         self.updateAlgorithmFilteringList(MA01_ALGORITHM_LIST, 'step2')
         self.monsterLog.add_log( 1, 'MA01 알고리즘 STEP2 업데이트 완료!' )
+        self.updateDailyListDataInfo('step02',len(MA01_ALGORITHM_LIST))
 
         self.monsterLog.add_log( 1, 'MA01 알고리즘 리스트 Tracking Start!!' )
         self.algFn.min_max_price_tracking()
