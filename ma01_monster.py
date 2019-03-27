@@ -118,7 +118,7 @@ class MA01():
         todayString = datetime.datetime.now().strftime("%Y-%m-%d")
         try:
             with sdi_db.cursor() as curs:
-                sql = "UPDATE `MA01_daily_list` SET step2 = '"+lng+"' WHERE date = '"+todayString+"' "
+                sql = "UPDATE `MA01_daily_list` SET step2 = '"+str(lng)+"' WHERE date = '"+todayString+"' "
                 print(sql)
                 curs.execute( sql )
         finally:

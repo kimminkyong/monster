@@ -23,7 +23,7 @@ class PyMonster():
 		self.monster_first_setting()
 		self.stock_item_code_crawling()
 		self.monsterLog.add_log( 0, '설정기간동안의 일별정보 저장' )
-		self.codeCrawler.get_stock_price_first('2018-01-01')
+		self.codeCrawler.get_stock_price_first('2018-06-01')
 	
 	def monster_daily_doit(self):
 		log_today = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -50,7 +50,7 @@ if __name__=="__main__":
 	#pymonster.monster_brilliant_start()
 	pymonster.monster_daily_doit()
 	
-	#time.sleep(120) #내 컴은 소중하니깐(2분간 휴식)
+	time.sleep(120) #내 컴은 소중하니깐(2분간 휴식)
 	pymonster.monster_alg_do()
 	
 
