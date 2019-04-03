@@ -42,6 +42,8 @@ class PyMonster():
 	def monster_alg_do(self):
 		self.MA01.do_classification_algorithm()
 	
+	def special_doing(self):
+		self.MA01.do_anything()
 		
 
 if __name__=="__main__":
@@ -50,7 +52,7 @@ if __name__=="__main__":
 	#pymonster.monster_brilliant_start()
 	pymonster.monster_daily_doit()
 	
-	time.sleep(120) #내 컴은 소중하니깐(2분간 휴식)
+	time.sleep(60) #내 컴은 소중하니깐(2분간 휴식)
 	pymonster.monster_alg_do()
-	
+	#pymonster.special_doing()
 

@@ -70,9 +70,9 @@ class MA01():
         
         try:
             with sdi_db.cursor() as curs:
-                sql = "INSERT INTO `"+tableName+"` (code, date, today_volume, avr30_volume, avr60_volume, change_per, alg_step) values (%s,%s,%s,%s,%s,%s,%s)"
+                sql = "INSERT INTO `"+tableName+"` (code, date, today_volume, avr30_volume, avr60_volume, change_per, alg_step, base_price) values (%s,%s,%s,%s,%s,%s,%s,%s)"
                 print(sql)
-                curs.execute( sql, (arrayData[0], arrayData[1], int(arrayData[6]), int(avr30_vol), int(avr60_vol),  arrayData[7], algStep ) )
+                curs.execute( sql, (arrayData[0], arrayData[1], int(arrayData[6]), int(avr30_vol), int(avr60_vol),  arrayData[7], algStep, int(arrayData[5]) ) )
         finally:
             sdi_db.commit()
     
@@ -123,6 +123,11 @@ class MA01():
                 curs.execute( sql )
         finally:
             sdi_db.commit()
+
+    def do_anything(self):
+        print("special doing")
+        self.algFn.custom_add_colume('base_price', 'tracking')
+
 
     def do_classification_algorithm(self):
         print("MA01!! Do Classification Algorithm!")
