@@ -22,7 +22,7 @@ class MA01():
         sdi_db = self.monsterDB.dbSDI()
         try:
             with sdi_db.cursor() as curs:
-                curs.execute( "CREATE TABLE IF NOT EXISTS `"+tableName+"` (date  VARCHAR(20), code  VARCHAR(20), today_volume VARCHAR(255), avr30_volume VARCHAR(255), avr60_volume VARCHAR(255), change_per VARCHAR(100), alg_step VARCHAR(20), max_price VARCHAR(255), min_price VARCHAR(255), tracking BOOLEAN )" )
+                curs.execute( "CREATE TABLE IF NOT EXISTS `"+tableName+"` (date  VARCHAR(20), code  VARCHAR(20), today_volume VARCHAR(255), avr30_volume VARCHAR(255), avr60_volume VARCHAR(255), change_per VARCHAR(100), alg_step VARCHAR(20), max_price VARCHAR(255), min_price VARCHAR(255), tracking BOOLEAN, min_price VARCHAR(255) )" )
         finally:
             sdi_db.commit()
             print("%s 테이블이 생성 되었습니다." %tableName)
