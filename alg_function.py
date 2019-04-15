@@ -155,7 +155,10 @@ class algFunctions():
             print("get_today_per_close OK!!")
 
     def min_max_price_between_date(self, code, sdate):
-        #todayString = datetime.datetime.now().strftime("%Y-%m-%d")
+        todayString = datetime.datetime.now().strftime("%Y-%m-%d")
+        print("kmk")
+        print(sdate == todayString)
+
         tomorrows = datetime.datetime.today()+datetime.timedelta(days=1)
         tomorrowsString = tomorrows.strftime("%Y-%m-%d")
         print(tomorrowsString)
@@ -170,14 +173,24 @@ class algFunctions():
         return_list=[]
         try:
             with sci_db.cursor() as curs:
-                sql = "SELECT high,low FROM `"+code+"` WHERE date BETWEEN '"+sdate+"' AND '"+tomorrowsString+"' ORDER BY date DESC"
-                print(sql)
-                curs.execute(sql)
-                items = curs.fetchall()
-                print(items)
-                for i in range(len(items)):
-                    max_list.append(items[i][0])
-                    min_list.append(items[i][1])
+                if sdate == todayString:
+                    sql = "SELECT close FROM `"+code+"` WHERE date BETWEEN '"+sdate+"' AND '"+tomorrowsString+"' ORDER BY date DESC"
+                    print(sql)
+                    curs.execute(sql)
+                    items = curs.fetchall()
+                    print(items)
+                    for i in range(len(items)):
+                        max_list.append(items[i][0])
+                        min_list.append(items[i][0])
+                else:
+                    sql = "SELECT high,low FROM `"+code+"` WHERE date BETWEEN '"+sdate+"' AND '"+tomorrowsString+"' ORDER BY date DESC"
+                    print(sql)
+                    curs.execute(sql)
+                    items = curs.fetchall()
+                    print(items)
+                    for i in range(len(items)):
+                        max_list.append(items[i][0])
+                        min_list.append(items[i][1])
                 
         finally:
             print(max_list)

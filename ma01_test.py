@@ -55,9 +55,10 @@ class MA01():
         #self.algFn.custom_add_colume('min_price', 'max_price')
         #self.algFn.custom_add_colume_bool('tracking', 'min_price')
         #self.algFn.min_max_price_tracking()
-        self.insertDailyListDataInfo('step01',len(MA01_ALGORITHM_LIST),'2019-03-13')
-        self.updateDailyListDataInfo('step01',len(MA01_ALGORITHM_LIST),'2019-03-13')
-        self.deleteDailyListDataInfo('2019-03-13')
+        # self.insertDailyListDataInfo('step01',len(MA01_ALGORITHM_LIST),'2019-03-13')
+        # self.updateDailyListDataInfo('step01',len(MA01_ALGORITHM_LIST),'2019-03-13')
+        # self.deleteDailyListDataInfo('2019-03-13')
+        self.algFn.min_max_price_between_date('000020','2019-04-15')
 
 if __name__=="__main__":
 	ma01 = MA01()
