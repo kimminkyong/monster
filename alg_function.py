@@ -156,8 +156,6 @@ class algFunctions():
 
     def min_max_price_between_date(self, code, sdate):
         todayString = datetime.datetime.now().strftime("%Y-%m-%d")
-        print("kmk")
-        print(sdate == todayString)
 
         tomorrows = datetime.datetime.today()+datetime.timedelta(days=1)
         tomorrowsString = tomorrows.strftime("%Y-%m-%d")
@@ -166,6 +164,10 @@ class algFunctions():
         atday = datetime.datetime.today()-datetime.timedelta(days=30)
         atdayString = atday.strftime("%Y-%m-%d")
         print(atdayString)
+        
+        startday = datetime.datetime( int(sdate[0:4]),int(sdate[5:7]),int(sdate[8:10]),0,0,0,0)-datetime.timedelta(days=30) 
+        startdayString = startday.strftime("%Y-%m-%d")
+        print(startdayString)
 
         sci_db = self.monsterDB.dbSCI()
         max_list = []
@@ -183,7 +185,7 @@ class algFunctions():
                         max_list.append(items[i][0])
                         min_list.append(items[i][0])
                 else:
-                    sql = "SELECT high,low FROM `"+code+"` WHERE date BETWEEN '"+sdate+"' AND '"+tomorrowsString+"' ORDER BY date DESC"
+                    sql = "SELECT high,low FROM `"+code+"` WHERE date BETWEEN '"+startdayString+"' AND '"+tomorrowsString+"' ORDER BY date DESC"
                     print(sql)
                     curs.execute(sql)
                     items = curs.fetchall()
