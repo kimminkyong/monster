@@ -58,7 +58,8 @@ class MA01():
         # self.insertDailyListDataInfo('step01',len(MA01_ALGORITHM_LIST),'2019-03-13')
         # self.updateDailyListDataInfo('step01',len(MA01_ALGORITHM_LIST),'2019-03-13')
         # self.deleteDailyListDataInfo('2019-03-13')
-        self.algFn.min_max_price_between_date('000020','2019-04-15')
+        self.algFn.min_max_price_between_date('000020','2019-03-23')
+        
 
 if __name__=="__main__":
 	ma01 = MA01()

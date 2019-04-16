@@ -60,6 +60,36 @@ class algFunctions():
                 return lst
         finally:
             print("over_volume10_30day OK!!")
+    
+    def over_volume10_140day(self, arry):
+        sci_db = self.monsterDB.dbSCI()
+        try:
+            with sci_db.cursor() as curs:
+                
+                lst=[]
+                for i in range(len(arry)):
+                    in_list = []
+                    todayVolume = 0
+                    sum139 = 0
+
+                    sql = "SELECT volume,date FROM `"+arry[i]+"` ORDER BY date DESC"
+                    curs.execute(sql)
+                    items = curs.fetchmany(140)
+                    for j in range(len(items)):
+                        in_list.append(items[j][0])
+                    
+                    # 거래일이 30일 이상인지 확인 
+                    if len(in_list) < 140 :
+                        print("30일이 않됨")
+                    else : 
+                        todayVolume = int(in_list[0])
+                        sum139 = int(sum(in_list)) - int(in_list[0])
+                        
+                    if( int(todayVolume) > int((sum139/139)*10) ):
+                        lst.append(arry[i])
+                return lst
+        finally:
+            print("over_volume10_140day OK!!")
 
     def red_colum_check(self, arry):
         sci_db = self.monsterDB.dbSCI()
@@ -165,7 +195,7 @@ class algFunctions():
         atdayString = atday.strftime("%Y-%m-%d")
         print(atdayString)
         
-        startday = datetime.datetime( int(sdate[0:4]),int(sdate[5:7]),int(sdate[8:10]),0,0,0,0)-datetime.timedelta(days=30) 
+        startday = datetime.datetime( int(sdate[0:4]),int(sdate[5:7]),int(sdate[8:10]),0,0,0,0)+datetime.timedelta(days=1) 
         startdayString = startday.strftime("%Y-%m-%d")
         print(startdayString)
 

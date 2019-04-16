@@ -139,7 +139,7 @@ class MA01():
         MA01_ALGORITHM_LIST = self.algFn.min_max_price_filter(500, 50000)
         
         self.monsterLog.add_log( 1, '30거래일 동안의 거래량 10 이상의 종목 검색' )
-        MA01_ALGORITHM_LIST = self.algFn.over_volume10_30day(MA01_ALGORITHM_LIST)
+        MA01_ALGORITHM_LIST = self.algFn.over_volume10_140day(MA01_ALGORITHM_LIST)
         print(MA01_ALGORITHM_LIST)
         
         self.monsterLog.add_log( 1, '양봉 종목 검색' )
