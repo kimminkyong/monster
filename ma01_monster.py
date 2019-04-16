@@ -66,13 +66,13 @@ class MA01():
     def insertListData(self, tableName, arrayData, algStep):
         sdi_db = self.monsterDB.dbSDI()
         avr30_vol = self.algFn.get_avr_volume(arrayData[0], 30)
-        avr60_vol = self.algFn.get_avr_volume(arrayData[0], 60)
+        avr140_vol = self.algFn.get_avr_volume(arrayData[0], 140)
         
         try:
             with sdi_db.cursor() as curs:
                 sql = "INSERT INTO `"+tableName+"` (code, date, today_volume, avr30_volume, avr60_volume, change_per, alg_step, base_price) values (%s,%s,%s,%s,%s,%s,%s,%s)"
                 print(sql)
-                curs.execute( sql, (arrayData[0], arrayData[1], int(arrayData[6]), int(avr30_vol), int(avr60_vol),  arrayData[7], algStep, int(arrayData[5]) ) )
+                curs.execute( sql, (arrayData[0], arrayData[1], int(arrayData[6]), int(avr30_vol), int(avr140_vol),  arrayData[7], algStep, int(arrayData[5]) ) )
         finally:
             sdi_db.commit()
     
@@ -138,7 +138,7 @@ class MA01():
         #최고가 최저가 범위 내의 종목 검색 
         MA01_ALGORITHM_LIST = self.algFn.min_max_price_filter(500, 50000)
         
-        self.monsterLog.add_log( 1, '30거래일 동안의 거래량 10 이상의 종목 검색' )
+        self.monsterLog.add_log( 1, '140거래일 동안의 거래량 10 이상의 종목 검색' )
         MA01_ALGORITHM_LIST = self.algFn.over_volume10_140day(MA01_ALGORITHM_LIST)
         print(MA01_ALGORITHM_LIST)
         
