@@ -158,7 +158,7 @@ class MA01():
         todayString = datetime.datetime.now().strftime("%Y-%m-%d")
         try:
             with sdi_db.cursor() as curs:
-                sql = "INSERT INTO `MA01_daily_list` (date, step1) values (%s,%s,%s,%s)"
+                sql = "INSERT INTO `MA01_daily_list` (date, step1, step2, step3) values (%s,%s,%s,%s)"
                 print(sql)
                 curs.execute( sql, (todayString, array[0], array[1], array[2] ) )
         finally:
