@@ -152,10 +152,38 @@ class MA01():
             finally:
                 print("duplicateDelete end")
         return newArray
+    
+    def setCountStep(self, array):
+        sdi_db = self.monsterDB.dbSDI()
+        todayString = datetime.datetime.now().strftime("%Y-%m-%d")
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "INSERT INTO `MA01_daily_list` (date, step1) values (%s,%s,%s,%s)"
+                print(sql)
+                curs.execute( sql, (todayString, array[0], array[1], array[2] ) )
+        finally:
+            sdi_db.commit()
+
+
+    def countStep(self):
+        sdi_db = self.monsterDB.dbSDI()
+        todayString = datetime.datetime.now().strftime("%Y-%m-%d")
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "SELECT SUM(alg_step LIKE '%step1%') AS step1, SUM(alg_step LIKE '%step2%') AS step2, SUM(alg_step LIKE '%step3%') AS step3 FROM "+MA01_ALGORITHM_TABLE+" WHERE date='"+todayString+"'"
+                curs.execute(sql)
+                result = curs.fetchone()
+                if result:
+                    self.setCountStep(result)
+                else:
+                    print("check count step error");
+        finally:
+            sdi_db.commit()
+
 
     def do_anything(self):
         print("special doing")
-        self.algFn.custom_add_colume('base_price', 'tracking')
+        self.countStep()
 
 
     def do_classification_algorithm(self):
@@ -183,7 +211,7 @@ class MA01():
         self.monsterLog.add_log( 1, 'MA01 알고리즘 중복 종목 추출 완료!' )
 
         self.insertAlgorithmFilteringList(MA01_ALGORITHM_TABLE, MA01_ALGORITHM_LIST, 'step1')
-        self.insertDailyListDataInfo('step01',len(MA01_ALGORITHM_LIST))
+        #self.insertDailyListDataInfo('step01',len(MA01_ALGORITHM_LIST))
         print(MA01_ALGORITHM_LIST)
         self.monsterLog.add_log( 1, 'MA01 알고리즘 STEP1 저장 완료!' )
         
@@ -193,11 +221,13 @@ class MA01():
         self.monsterLog.add_log( 1, 'MA01 알고리즘 검색 종료!!' )
         self.updateAlgorithmFilteringList(MA01_ALGORITHM_LIST, 'step2')
         self.monsterLog.add_log( 1, 'MA01 알고리즘 STEP2 업데이트 완료!' )
-        self.updateDailyListDataInfo('step02',len(MA01_ALGORITHM_LIST))
+        #self.updateDailyListDataInfo('step02',len(MA01_ALGORITHM_LIST))
         
         #중복 종목 update
         self.updateAlgorithmFilteringList(DUPLICATE_LIST, 'step3')
-        self.updateDailyListDataInfo3('step03',len(DUPLICATE_LIST))
+        #self.updateDailyListDataInfo3('step03',len(DUPLICATE_LIST))
+
+        self.countStep()
 
         self.monsterLog.add_log( 1, 'MA01 알고리즘 리스트 Tracking Start!!' )
         self.algFn.min_max_price_tracking()
