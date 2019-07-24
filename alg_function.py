@@ -217,7 +217,7 @@ class algFunctions():
                         max_list.append(items[i][0])
                         min_list.append(items[i][0])
                 else:
-                    sql = "SELECT high,low FROM `"+code+"` WHERE date BETWEEN '"+atdayString+"' AND '"+tomorrowsString+"' ORDER BY date DESC"
+                    sql = "SELECT high,low FROM `"+code+"` WHERE date BETWEEN '"+startdayString+"' AND '"+tomorrowsString+"' ORDER BY date DESC"
                     print(sql)
                     curs.execute(sql)
                     items = curs.fetchall()
@@ -227,11 +227,16 @@ class algFunctions():
                         min_list.append(items[i][1])
                 
         finally:
-            print(max_list)
-            print(min_list)
-            return_list.append(max(max_list))
-            return_list.append(min(min_list))
-            return_list.append(last_flag)
+            if(len(max_list) or len(min_list)):
+                return_list.append(0)
+                return_list.append(0)
+                return_list.append(True)
+            else:
+                print(max_list)
+                print(min_list)
+                return_list.append(max(max_list))
+                return_list.append(min(min_list))
+                return_list.append(last_flag)
             print(return_list)
             print("min max price check!")
             return return_list
@@ -293,11 +298,14 @@ class algFunctions():
 
     def min_max_price_update(self, date, code, max_p, min_p, flag):
         sdi_db = self.monsterDB.dbSDI()
-        max_date = self.get_max_price_date(code, max_p, flag)
+        if(max_p == 0 or min_p == 0 ):
+            max_date = 0000-00-00
+        else:
+            max_date = self.get_max_price_date(code, max_p, flag)
         print(max_date)
         try:
             with sdi_db.cursor() as curs:
-                sql = "UPDATE `MA01` SET max_date = "+max_date+", max_price = "+max_p+", min_price = "+min_p+", tracking = 1 WHERE code = '"+code+"' and date = '"+date+"' "
+                sql = "UPDATE `MA01` SET max_date = '"+max_date+"', max_price = "+max_p+", min_price = "+min_p+", tracking = 1 WHERE code = '"+code+"' and date = '"+date+"' "
                 result = curs.execute( sql )
                 print(result)
         finally:
