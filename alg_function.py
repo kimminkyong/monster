@@ -227,7 +227,7 @@ class algFunctions():
                         min_list.append(items[i][1])
                 
         finally:
-            if(len(max_list) or len(min_list)):
+            if(len(max_list) == 0 or len(min_list) == 0):
                 return_list.append(0)
                 return_list.append(0)
                 return_list.append(True)
@@ -298,8 +298,8 @@ class algFunctions():
 
     def min_max_price_update(self, date, code, max_p, min_p, flag):
         sdi_db = self.monsterDB.dbSDI()
-        if(max_p == 0 or min_p == 0 ):
-            max_date = 0000-00-00
+        if(max_p == '0' or min_p == '0' ):
+            max_date = '0000-00-00'
         else:
             max_date = self.get_max_price_date(code, max_p, flag)
         print(max_date)
