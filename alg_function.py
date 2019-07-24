@@ -217,7 +217,7 @@ class algFunctions():
                         max_list.append(items[i][0])
                         min_list.append(items[i][0])
                 else:
-                    sql = "SELECT high,low FROM `"+code+"` WHERE date BETWEEN '"+startdayString+"' AND '"+tomorrowsString+"' ORDER BY date DESC"
+                    sql = "SELECT high,low FROM `"+code+"` WHERE date BETWEEN '"+atday+"' AND '"+tomorrowsString+"' ORDER BY date DESC"
                     print(sql)
                     curs.execute(sql)
                     items = curs.fetchall()
