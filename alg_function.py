@@ -274,7 +274,8 @@ class algFunctions():
                 sql = "SELECT date FROM `"+code+"` WHERE high = "+price+" ORDER BY date DESC"
                 curs.execute(sql)
                 items = curs.fetchone()
-                m_date = items[0]
+                print(items)
+                m_date = items
                 return m_date
         finally:
             sci_db.commit()
