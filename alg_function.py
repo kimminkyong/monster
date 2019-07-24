@@ -268,10 +268,13 @@ class algFunctions():
 
     def get_max_price_date(self, code, price):
         sci_db = self.monsterDB.dbSCI()
-
+        print("get_max_price_date")
+        print(code)
+        print(price)
         try:
             with sci_db.cursor() as curs:
                 sql = "SELECT date FROM `"+code+"` WHERE high = "+price+" ORDER BY date DESC"
+                print(sql)
                 curs.execute(sql)
                 items = curs.fetchone()
                 print(items)
