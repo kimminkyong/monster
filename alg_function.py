@@ -283,8 +283,8 @@ class algFunctions():
                 print(sql)
                 curs.execute(sql)
                 items = curs.fetchone()
-                print(items)
-                m_date = items
+                print(items[0])
+                m_date = str(items[0])
                 return m_date
         finally:
             sci_db.commit()
