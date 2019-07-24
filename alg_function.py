@@ -203,6 +203,7 @@ class algFunctions():
         max_list = []
         min_list = []
         return_list=[]
+        last_flag = False
         try:
             with sci_db.cursor() as curs:
                 if sdate == todayString:
@@ -211,6 +212,7 @@ class algFunctions():
                     curs.execute(sql)
                     items = curs.fetchall()
                     print(items)
+                    last_flag = True
                     for i in range(len(items)):
                         max_list.append(items[i][0])
                         min_list.append(items[i][0])
@@ -229,6 +231,7 @@ class algFunctions():
             print(min_list)
             return_list.append(max(max_list))
             return_list.append(min(min_list))
+            return_list.append(last_flag)
             print(return_list)
             print("min max price check!")
             return return_list
@@ -266,14 +269,17 @@ class algFunctions():
         finally:
             print("삭제완료")
 
-    def get_max_price_date(self, code, price):
+    def get_max_price_date(self, code, price, flag):
         sci_db = self.monsterDB.dbSCI()
         print("get_max_price_date")
         print(code)
         print(price)
         try:
             with sci_db.cursor() as curs:
-                sql = "SELECT date FROM `"+code+"` WHERE high = "+price+" ORDER BY date DESC"
+                if(flag):
+                    sql = "SELECT date FROM `"+code+"` WHERE close = "+price+" ORDER BY date DESC"
+                else:
+                    sql = "SELECT date FROM `"+code+"` WHERE high = "+price+" ORDER BY date DESC"
                 print(sql)
                 curs.execute(sql)
                 items = curs.fetchone()
@@ -285,9 +291,9 @@ class algFunctions():
             print("max date!")
    
 
-    def min_max_price_update(self, date, code, max_p, min_p):
+    def min_max_price_update(self, date, code, max_p, min_p, flag):
         sdi_db = self.monsterDB.dbSDI()
-        max_date = self.get_max_price_date(code, max_p)
+        max_date = self.get_max_price_date(code, max_p, flag)
         try:
             with sdi_db.cursor() as curs:
                 sql = "UPDATE `MA01` SET max_date = "+max_date+", max_price = "+max_p+", min_price = "+min_p+", tracking = 1 WHERE code = '"+code+"' and date = '"+date+"' "
@@ -321,7 +327,7 @@ class algFunctions():
                 if result:
                     for i in range(len(result)):
                         nx_price = self.min_max_price_between_date(result[i][1], result[i][0])
-                        self.min_max_price_update(result[i][0], result[i][1], str(nx_price[0]), str(nx_price[1]))
+                        self.min_max_price_update(result[i][0], result[i][1], str(nx_price[0]), str(nx_price[1]), nx_price[2])
                 else:
                     print("MA01 table list get error")
         finally:
