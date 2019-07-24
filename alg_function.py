@@ -266,13 +266,27 @@ class algFunctions():
         finally:
             print("삭제완료")
 
+    def get_max_price_date(self, code, price):
+        sci_db = self.monsterDB.dbSCI()
+
+        try:
+            with sci_db.cursor() as curs:
+                sql = "SELECT date FROM `"+code+"` WHERE high = "+price+" ORDER BY date DESC"
+                curs.execute(sql)
+                items = curs.fetchone()
+                m_date = items[0]
+                return m_date
+        finally:
+            sci_db.commit()
+            print("max date!")
    
 
     def min_max_price_update(self, date, code, max_p, min_p):
         sdi_db = self.monsterDB.dbSDI()
+        max_date = self.get_max_price_date(code, max_p)
         try:
             with sdi_db.cursor() as curs:
-                sql = "UPDATE `MA01` SET max_price = "+max_p+", min_price = "+min_p+", tracking = 1 WHERE code = '"+code+"' and date = '"+date+"' "
+                sql = "UPDATE `MA01` SET max_date = "+max_date+", max_price = "+max_p+", min_price = "+min_p+", tracking = 1 WHERE code = '"+code+"' and date = '"+date+"' "
                 result = curs.execute( sql )
                 print(result)
         finally:
