@@ -82,6 +82,9 @@ class algFunctions():
                     if len(in_list) < 140 :
                         print("30일이 않됨")
                     else : 
+                        print(i)
+                        print(int(in_list[0]))
+                        print(nt(sum(in_list)))
                         todayVolume = int(in_list[0])
                         sum139 = int(sum(in_list)) - int(in_list[0])
                         
