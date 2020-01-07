@@ -82,9 +82,10 @@ class algFunctions():
                     if len(in_list) < 140 :
                         print("30일이 않됨")
                     else : 
-                        print(i)
+                        print(arry[i])
                         print(int(in_list[0]))
-                        print(nt(sum(in_list)))
+                        print(in_list)
+                        in_list = list(map(int, in_list))#리스트의 값이 str로 넘겨올 경우 
                         todayVolume = int(in_list[0])
                         sum139 = int(sum(in_list)) - int(in_list[0])
                         
@@ -152,6 +153,7 @@ class algFunctions():
 
     def get_avr_volume(self, code, day):
         sci_db = self.monsterDB.dbSCI()
+        print(code)
         try:
             with sci_db.cursor() as curs:
                 day_len = int(day)
@@ -168,6 +170,7 @@ class algFunctions():
                 if len(in_list) < day_len :
                     print(" 거래일 부족! ")
                 else : 
+                    print(in_list)
                     sumVolume = int(sum(in_list)) - int(in_list[0])
                     
                     avrVolume = int(sumVolume/day_len)
