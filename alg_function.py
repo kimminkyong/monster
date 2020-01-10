@@ -166,6 +166,8 @@ class algFunctions():
                 for j in range(len(items)):
                     in_list.append(items[j][0])
                 
+                in_list = list(map(int, in_list))
+
                 # 거래일이 30일 이상인지 확인 
                 if len(in_list) < day_len :
                     print(" 거래일 부족! ")
