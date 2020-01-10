@@ -144,6 +144,7 @@ class algFunctions():
                         # print(st_p)
                         # print(en_p)
                         # print( int(sum(in_list)/len(in_list)) )
+                        in_list = list(map(int, in_list))
                         p140 = int(sum(in_list)/len(in_list))
                         if p140 > int(st_p) and p140 < int(en_p):
                             lst.append(arry[i])
