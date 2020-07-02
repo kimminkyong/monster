@@ -215,7 +215,7 @@ class MA01():
                 if result:
                     self.setCountStep(result)
                 else:
-                    print("check count step error");
+                    print("check count step error")
         finally:
             sdi_db.commit()
 
