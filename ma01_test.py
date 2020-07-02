@@ -70,7 +70,22 @@ class MA01():
             sdi_db.commit()
             print("%s 테이블이 생성 되었습니다." %tableName)
 
-    
+    def insertCalendarToday(self):
+        sdi_db = self.monsterDB.dbSDI()
+        todayString = datetime.datetime.now().strftime("%Y-%m-%d")
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "SELECT * FROM "+MONSTER_CALENDAR_TABLE+" WHERE date='"+todayString+"' "
+                curs.execute( sql )
+                result = curs.fetchone()
+                if result:
+                    print("??")
+                else:
+                    weekNum = datetime.datetime.today().weekday()
+                    sql = "INSERT INTO "+MONSTER_CALENDAR_TABLE+" (date, week) values (%s,%s)"
+                    curs.execute( sql, (todayString, weekNum ) )
+        finally:
+            sdi_db.commit()
 
     def test(self):
         #self.algFn.custom_add_colume('max_price', 'alg_step')
