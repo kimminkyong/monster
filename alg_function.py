@@ -351,6 +351,91 @@ class algFunctions():
         finally:
             print("min_max_price_tracking!")
 
+    def daily_up_down_tracking(self):
+        sdi_db = self.monsterDB.dbSDI()
+        # tomorrows = datetime.datetime.today()+datetime.timedelta(days=1)
+        # tomorrowsString = tomorrows.strftime("%Y-%m-%d")
+
+        # atday = datetime.datetime.today()-datetime.timedelta(days=60)
+        # atdayString = atday.strftime("%Y-%m-%d")
+
+        getDateArray=[]
+        insertUpDownData = []
+
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "SELECT date FROM `MA01_daily_list` ORDER BY date DESC"
+                curs.execute(sql)
+                result = curs.fetchmany(60)
+                if result:
+                    for i in range(len(result)):
+                        getDateArray.append( result[i][0] )
+                else:
+                    print("error get date!!")
+        finally:
+            print("end of get date!")
+
+        print(getDateArray)
+        try:
+            with sdi_db.cursor() as curs:
+                total_result = []
+
+                for i in range(len(getDateArray)):
+                    print(getDateArray[i])
+                    sql = "SELECT max_price,base_price,alg_step FROM `MA01` WHERE date = '"+getDateArray[i]+"' ORDER BY date DESC"
+                    curs.execute(sql)
+                    result = curs.fetchall()
+                    st1_arr = [0, 0]
+                    st2_arr = [0, 0]
+                    st3_arr = [0, 0]
+                    if result:
+                        for j in range(len(result)):
+                            if(result[j][0] > result[j][1]) :
+                                if(result[j][2] == 'step1') :
+                                    st1_arr[0] = st1_arr[0]+1
+                                elif(result[j][2] == 'step2') :
+                                    st2_arr[0] = st2_arr[0]+1
+                                else:
+                                    st3_arr[0] = st3_arr[0]+1
+                            else:
+                                if(result[j][2] == 'step1') :
+                                    st1_arr[1] = st1_arr[1]+1
+                                elif(result[j][2] == 'step2') :
+                                    st2_arr[1] = st2_arr[1]+1
+                                else:
+                                    st3_arr[1] = st3_arr[1]+1
+                    else:
+                        print("MA01 table list get error")
+                    
+                    total_result.append( ('000010', getDateArray[i], st1_arr[0], st1_arr[1] ) )
+                    total_result.append( ('000020', getDateArray[i], st2_arr[0], st2_arr[1] ) )
+                    total_result.append( ('000030', getDateArray[i], st3_arr[0], st3_arr[1] ) )
+                    #print(total_result)
+            insertUpDownData = total_result
+                
+        finally:
+            print("min_max_price_tracking!")
+            print(tuple(total_result))
+
+        try:
+            with sdi_db.cursor() as curs:
+                empty_sql = "DELETE from `MONSTER_UPDOWN`"
+                curs.execute( empty_sql )
+        finally:
+            print("delete")
+            sdi_db.commit()
+
+        try:
+            with sdi_db.cursor() as curs:
+
+                insertUpDownData = tuple(insertUpDownData)
+                sql = "INSERT INTO `MONSTER_UPDOWN` (code, date, up, down) values (%s,%s,%s,%s)"
+                print(sql)
+                curs.executemany( sql, insertUpDownData )
+        finally:
+            print("end")
+            sdi_db.commit()
+
         
 
 

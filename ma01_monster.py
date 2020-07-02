@@ -10,6 +10,8 @@ import monster_log
 
 MA01_ALGORITHM_LIST = []
 MA01_ALGORITHM_TABLE = "MA01"
+MONSTER_CALENDAR_TABLE = "MONSTER_CALENDAR"
+MONSTER_ALGORITHM_UPDOWN_TABLE = "MONSTER_UPDOWN"
 DUPLICATE_LIST = []
 
 class MA01():
@@ -37,6 +39,25 @@ class MA01():
             sdi_db.commit()
             print("%s 테이블이 생성 되었습니다." %tableName)
     
+    def createCalendarTable(self, tableName):
+        sdi_db = self.monsterDB.dbSDI()
+        try:
+            with sdi_db.cursor() as curs:
+                curs.execute( "CREATE TABLE IF NOT EXISTS `"+tableName+"` (date  VARCHAR(20), week  VARCHAR(20) )" )
+        finally:
+            sdi_db.commit()
+            print("%s 테이블이 생성 되었습니다." %tableName)
+    
+    def createAlgorithmUpAndDownTable(self, tableName):
+        sdi_db = self.monsterDB.dbSDI()
+        try:
+            with sdi_db.cursor() as curs:
+                curs.execute( "CREATE TABLE IF NOT EXISTS `"+tableName+"` (code  VARCHAR(20), date  VARCHAR(20), up  VARCHAR(20), down  VARCHAR(20) )" )
+        finally:
+            sdi_db.commit()
+            print("%s 테이블이 생성 되었습니다." %tableName)
+
+    
     def initTableLowsToday(self):
         sdi_db = self.monsterDB.dbSDI()
         initToday = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -47,6 +68,24 @@ class MA01():
             sdi_db.commit()
             print("init table lows delete")
         
+
+    def insertCalendarToday(self):
+        sdi_db = self.monsterDB.dbSDI()
+        todayString = datetime.datetime.now().strftime("%Y-%m-%d")
+        try:
+            with sdi_db.cursor() as curs:
+                sql = "SELECT * FROM "+MONSTER_CALENDAR_TABLE+" WHERE date='"+todayString+"' "
+                curs.execute( sql )
+                result = curs.fetchone()
+                if result:
+                    print("??")
+                else:
+                    weekNum = datetime.datetime.today().weekday()
+                    sql = "INSERT INTO "+MONSTER_CALENDAR_TABLE+" (date, week) values (%s,%s)"
+                    curs.execute( sql, (todayString, weekNum ) )
+        finally:
+            sdi_db.commit()
+
     
     def insertAlgorithmFilteringList(self, tableName, arrayData, algStep):
         sdi_db = self.monsterDB.dbSDI()
@@ -190,6 +229,8 @@ class MA01():
         print("MA01!! Do Classification Algorithm!")
         self.createAlgorithmTable(MA01_ALGORITHM_TABLE)
         self.createDailyAlgorithmListTable('MA01_daily_list')
+        self.createCalendarTable(MONSTER_CALENDAR_TABLE)
+        self.createAlgorithmUpAndDownTable(MONSTER_ALGORITHM_UPDOWN_TABLE)
 
         self.monsterLog.add_log( 1, 'MA01 알고리즘 검색 시작!!' )
         #최고가 최저가 범위 내의 종목 검색 
@@ -232,5 +273,11 @@ class MA01():
         self.monsterLog.add_log( 1, 'MA01 알고리즘 리스트 Tracking Start!!' )
         self.algFn.min_max_price_tracking()
         self.monsterLog.add_log( 1, 'MA01 알고리즘 리스트 Tracking End!!' )
+
+        self.monsterLog.add_log( 1, 'MA01 UP & DOWN Tracking Start!!' )
+        self.algFn.daily_up_down_tracking()
+        self.monsterLog.add_log( 1, 'MA01 UP & DOWN Tracking End!!' )
         
+        #달력에 오늘 입력 
+        self.insertCalendarToday()
 

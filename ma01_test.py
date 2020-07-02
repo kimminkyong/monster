@@ -10,6 +10,8 @@ import alg_function
 
 MA01_ALGORITHM_LIST = []
 MA01_ALGORITHM_TABLE = "MA01"
+MONSTER_CALENDAR_TABLE = "MONSTER_CALENDAR"
+MONSTER_ALGORITHM_UPDOWN_TABLE = "MONSTER_UPDOWN"
 
 class MA01():
     def __init__(self):
@@ -50,16 +52,40 @@ class MA01():
         finally:
             sdi_db.commit()
 
+    def createCalendarTable(self, tableName):
+        sdi_db = self.monsterDB.dbSDI()
+        try:
+            with sdi_db.cursor() as curs:
+                curs.execute( "CREATE TABLE IF NOT EXISTS `"+tableName+"` (date  VARCHAR(20), week  VARCHAR(20) )" )
+        finally:
+            sdi_db.commit()
+            print("%s 테이블이 생성 되었습니다." %tableName)
+    
+    def createAlgorithmUpAndDownTable(self, tableName):
+        sdi_db = self.monsterDB.dbSDI()
+        try:
+            with sdi_db.cursor() as curs:
+                curs.execute( "CREATE TABLE IF NOT EXISTS `"+tableName+"` (code  VARCHAR(20), date  VARCHAR(20), up  VARCHAR(20), down  VARCHAR(20) )" )
+        finally:
+            sdi_db.commit()
+            print("%s 테이블이 생성 되었습니다." %tableName)
+
+    
+
     def test(self):
         #self.algFn.custom_add_colume('max_price', 'alg_step')
         #self.algFn.custom_add_colume('min_price', 'max_price')
         #self.algFn.custom_add_colume_bool('tracking', 'min_price')
-        self.algFn.min_max_price_tracking()
+        #self.algFn.min_max_price_tracking()
         # self.insertDailyListDataInfo('step01',len(MA01_ALGORITHM_LIST),'2019-03-13')
         # self.updateDailyListDataInfo('step01',len(MA01_ALGORITHM_LIST),'2019-03-13')
         # self.deleteDailyListDataInfo('2019-03-13')
         #self.algFn.min_max_price_between_date('000020','2019-03-23')
-        
+        self.createCalendarTable(MONSTER_CALENDAR_TABLE)
+        self.createAlgorithmUpAndDownTable(MONSTER_ALGORITHM_UPDOWN_TABLE)
+        self.algFn.daily_up_down_tracking()
+        #달력에 오늘 입력 
+        self.insertCalendarToday()
 
 if __name__=="__main__":
 	ma01 = MA01()
